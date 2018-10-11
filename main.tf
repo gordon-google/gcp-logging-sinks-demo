@@ -134,12 +134,6 @@ resource "google_logging_project_sink" "gce_network" {
 }
 
 
-//resource.type =gce_network
-
-
-
-
-
 /*
 Create the export facility
 */
