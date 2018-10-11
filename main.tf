@@ -19,20 +19,9 @@ limitations under the License.
 ///////////////////////////////////////////////////////////////////////////////////////
 
 //TODO: 
+//filter out GKE KubeLet heathcheck/heartbeat stuff
 
-# GCE Health Check
-# GCE Instance Group Manager
-# GCE Instance Template
-# GCE Project
-# GCE Reserved Address
-# GCE Route
-# GCE Subnetwork
-# GCE Target Pool
-# GCS Bucket
-# GKE Cluster Operations
-# GKE Container
-# Google Project
-# Kubernetes Cluster
+//add the following:
 # Logging export sink
 # Service Account
 
@@ -55,7 +44,7 @@ resource "google_storage_bucket" "gcp-log-bucket" {
 resource "google_bigquery_dataset" "gcp-bigquery-dataset" {
   dataset_id                  = "gcp_logs_dataset"
   location                    = "US"
-  default_table_expiration_ms = 3600000
+  default_table_expiration_ms = 86400000 # set to 24 hours, adjust to match your policy/requirements
 
   labels {
     env = "default"
@@ -150,7 +139,23 @@ resource "google_logging_project_sink" "gce_instance" {
   unique_writer_identity = true
 }
 
-// Create the Stackdriver Export Sink for gce_instanc Notifications
+// Create the Stackdriver Export Sink for gce_instance_group_manager Notifications
+resource "google_logging_project_sink" "gce_instance_group_manager" {
+  name        = "gcp_gce_instance_group_manager"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gce_instance_group_manager"
+  unique_writer_identity = true
+}
+
+// Create the Stackdriver Export Sink for gce_instance_template Notifications
+resource "google_logging_project_sink" "gce_instance_template" {
+  name        = "gcp_gce_gce_instance_template"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gce_instance_template"
+  unique_writer_identity = true
+}
+
+// Create the Stackdriver Export Sink for gce_health_check Notifications
 resource "google_logging_project_sink" "gce_health_check" {
   name        = "gcp_gce_health_check"
   destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
@@ -159,8 +164,98 @@ resource "google_logging_project_sink" "gce_health_check" {
   unique_writer_identity = true
 }
 
+// Create the Stackdriver Export Sink for gce_project Notifications
+resource "google_logging_project_sink" "gce_project" {
+  name        = "gcp_gce_project"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gce_project"
+
+  unique_writer_identity = true
+}
+
+// Create the Stackdriver Export Sink for gce_reserved_address Notifications
+resource "google_logging_project_sink" "gce_reserved_address" {
+  name        = "gcp_gce_reserved_address"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gce_reserved_address"
+
+  unique_writer_identity = true
+}
 
 
+// Create the Stackdriver Export Sink for gce_route Notifications
+resource "google_logging_project_sink" "gce_route" {
+  name        = "gcp_gce_route"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gce_route"
+
+  unique_writer_identity = true
+}
+
+// Create the Stackdriver Export Sink for gce_subnetwork Notifications
+resource "google_logging_project_sink" "gce_subnetwork" {
+  name        = "gcp_gce_subnetwork"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gce_subnetwork"
+
+  unique_writer_identity = true
+}
+
+// Create the Stackdriver Export Sink for gce_target_pool Notifications
+resource "google_logging_project_sink" "gce_target_pool" {
+  name        = "gcp_gce_target_pool"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gce_target_pool"
+
+  unique_writer_identity = true
+}
+
+
+// Create the Stackdriver Export Sink for gcs_bucket Notifications
+resource "google_logging_project_sink" "gcs_bucket" {
+  name        = "gcp_gcs_bucket"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gcs_bucket"
+
+  unique_writer_identity = true
+}
+
+
+// Create the Stackdriver Export Sink for gke_cluster Notifications
+resource "google_logging_project_sink" "gke_cluster" {
+  name        = "gcp_gke_cluster"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gke_cluster"
+
+  unique_writer_identity = true
+}
+
+// Create the Stackdriver Export Sink for container Notifications
+resource "google_logging_project_sink" "container" {
+  name        = "gcp_container"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = container"
+
+  unique_writer_identity = true
+}
+
+// Create the Stackdriver Export Sink for GCP project Notifications
+resource "google_logging_project_sink" "project" {
+  name        = "gcp_project"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = project"
+
+  unique_writer_identity = true
+}
+
+// Create the Stackdriver Export Sink for k8s_cluster Notifications
+resource "google_logging_project_sink" "k8s_cluster" {
+  name        = "gcp_k8s_cluster"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = k8s_cluster"
+
+  unique_writer_identity = true
+}
 
 /*
 Create the export facilities
@@ -225,6 +320,22 @@ resource "google_project_iam_binding" "gce_instance" {
   ]
 }
 
+resource "google_project_iam_binding" "gce_instance_group_manager" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gce_instance_group_manager.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "gce_instance_template" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gce_instance_template.writer_identity}",
+  ]
+}
+
 resource "google_project_iam_binding" "gce_health_check" {
   role = "roles/bigquery.dataEditor"
 
@@ -232,3 +343,85 @@ resource "google_project_iam_binding" "gce_health_check" {
     "${google_logging_project_sink.gce_health_check.writer_identity}",
   ]
 }
+
+resource "google_project_iam_binding" "gce_project" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gce_project.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "gce_reserved_address" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gce_reserved_address.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "gce_route" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gce_route.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "gce_subnetwork" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gce_subnetwork.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "gce_target_pool" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gce_target_pool.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "gcs_bucket" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gcs_bucket.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "gke_cluster" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gke_cluster.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "container" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.container.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "project" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.project.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "k8s_cluster" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.k8s_cluster.writer_identity}",
+  ]
+}
+
+
