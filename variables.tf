@@ -31,3 +31,9 @@ variable "project" {
   type        = "string"
   default="ace-tomato-218918"
 }
+
+variable "dataset" {
+  description = "The name of the project in which to create the Kubernetes cluster."
+  type        = "string"
+  default="ace-tomato"
+}

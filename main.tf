@@ -15,15 +15,6 @@ limitations under the License.
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//
-// This configuration will create a gcp cluster that will be used for creating
-// log information to be used by Stackdriver Logging.  The configuration will
-// also create the resources and Stackdriver Logging exports for Cloud Storage
-// and BigQuery.
-//
-///////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////////////
 // Create the resources needed for the Stackdriver Export Sinks
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -57,7 +48,7 @@ resource "google_bigquery_dataset" "gcp-bigquery-dataset" {
 // Create the primary cluster for this project.
 ///////////////////////////////////////////////////////////////////////////////////////
 
-// Create the gcp Cluster
+// Create A GKE Cluster to generate some logs
 // https://www.terraform.io/docs/providers/google/d/google_container_cluster.html
 resource "google_container_cluster" "primary" {
   name               = "stackdriver-logging"
@@ -97,17 +88,16 @@ resource "google_container_cluster" "primary" {
 
 // Create the Stackdriver Export Sink for BigQuery gcp Notifications
 resource "google_logging_project_sink" "bigquery-sink" {
-  name        = "gcp-bigquery-sink"
+  name        = "gcp_bigquery_sink"
   destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
   filter      = "resource.type = bigquery.v2.dataset"
 
   unique_writer_identity = true
 }
 
-
 // Create the Stackdriver Export Sink for gce_firewall_rule gcp Notifications
 resource "google_logging_project_sink" "gce_firewall_rule" {
-  name        = "gcp-gce_firewall_rule"
+  name        = "gcp_gce_firewall_rule"
   destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
   filter      = "resource.type = gce_firewall_rule"
 
@@ -116,7 +106,7 @@ resource "google_logging_project_sink" "gce_firewall_rule" {
 
 // Create the Stackdriver Export Sink for gce_forwarding_rule gcp Notifications
 resource "google_logging_project_sink" "gce_forwarding_rule" {
-  name        = "gcp-gce_forwarding_rule"
+  name        = "gcp_gce_forwarding_rule"
   destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
   filter      = "resource.type = gce_forwarding_rule"
 
@@ -126,13 +116,12 @@ resource "google_logging_project_sink" "gce_forwarding_rule" {
 
 // Create the Stackdriver Export Sink for gce_network gcp Notifications
 resource "google_logging_project_sink" "gce_network" {
-  name        = "gcp-gce_network"
+  name        = "gcp_gce_network"
   destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
   filter      = "resource.type = gce_network"
 
   unique_writer_identity = true
 }
-
 
 /*
 Create the export facility
