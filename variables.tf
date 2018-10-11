@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 /*
 Required Variables
 These must be provided at runtime.
@@ -23,17 +22,23 @@ These must be provided at runtime.
 variable "zone" {
   description = "The zone in which to create the Kubernetes cluster. Must match the region"
   type        = "string"
-  default="us-west1-a"
+  default     = "us-west1-a"
 }
 
 variable "project" {
-  description = "The name of the project in which to create the Kubernetes cluster."
+  description = "The name of the project."
   type        = "string"
-  default="ace-tomato-218918"
+  default     = "ace-tomato-218918"
 }
 
 variable "dataset" {
-  description = "The name of the project in which to create the Kubernetes cluster."
+  description = "A name for the GCP BigQuery Dataset"
   type        = "string"
-  default="ace-tomato"
+  default     = "gcp_logs"
+}
+
+variable "location" {
+  description = "The location for the GCP BigQuery dataset"
+  type        = "string"
+  default     = "US"
 }
