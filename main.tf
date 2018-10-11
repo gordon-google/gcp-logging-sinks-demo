@@ -18,6 +18,24 @@ limitations under the License.
 // Create the resources needed for the Stackdriver Export Sinks
 ///////////////////////////////////////////////////////////////////////////////////////
 
+//TODO: 
+
+# GCE Health Check
+# GCE Instance Group Manager
+# GCE Instance Template
+# GCE Project
+# GCE Reserved Address
+# GCE Route
+# GCE Subnetwork
+# GCE Target Pool
+# GCS Bucket
+# GKE Cluster Operations
+# GKE Container
+# Google Project
+# Kubernetes Cluster
+# Logging export sink
+# Service Account
+
 // Random string used to create a unique bucket name
 resource "random_id" "server" {
   byte_length = 8
@@ -86,11 +104,11 @@ resource "google_container_cluster" "primary" {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 
-// Create the Stackdriver Export Sink for BigQuery gcp Notifications
+// Create the Stackdriver Export Sink for BigQuery Audit Table CRUD type gcp Notifications
 resource "google_logging_project_sink" "bigquery-sink" {
   name        = "gcp_bigquery_sink"
   destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
-  filter      = "resource.type = bigquery.v2.dataset"
+  filter      = "resource.type = bigquery_resource protoPayload.methodName != tabledataservice.list protoPayload.methodName !=jobservice.jobcompleted protoPayload.methodName!= jobservice.getqueryresults"
 
   unique_writer_identity = true
 }
@@ -122,6 +140,17 @@ resource "google_logging_project_sink" "gce_network" {
 
   unique_writer_identity = true
 }
+
+// Create the Stackdriver Export Sink for gce_network gcp Notifications
+resource "google_logging_project_sink" "gce_instance" {
+  name        = "gcp_gce_instance"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gce_instance"
+
+  unique_writer_identity = true
+}
+
+
 
 /*
 Create the export facilities
@@ -175,5 +204,13 @@ resource "google_project_iam_binding" "gce_network" {
 
   members = [
     "${google_logging_project_sink.gce_network.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "gce_instance" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gce_instance.writer_identity}",
   ]
 }
