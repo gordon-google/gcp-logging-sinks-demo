@@ -104,7 +104,7 @@ resource "google_container_cluster" "primary" {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 
-// Create the Stackdriver Export Sink for BigQuery Audit Table CRUD type gcp Notifications
+// Create the Stackdriver Export Sink for BigQuery Audit Table CRUD type Notifications
 resource "google_logging_project_sink" "bigquery-sink" {
   name        = "gcp_bigquery_sink"
   destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
@@ -113,7 +113,7 @@ resource "google_logging_project_sink" "bigquery-sink" {
   unique_writer_identity = true
 }
 
-// Create the Stackdriver Export Sink for gce_firewall_rule gcp Notifications
+// Create the Stackdriver Export Sink for gce_firewall_rule Notifications
 resource "google_logging_project_sink" "gce_firewall_rule" {
   name        = "gcp_gce_firewall_rule"
   destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
@@ -122,7 +122,7 @@ resource "google_logging_project_sink" "gce_firewall_rule" {
   unique_writer_identity = true
 }
 
-// Create the Stackdriver Export Sink for gce_forwarding_rule gcp Notifications
+// Create the Stackdriver Export Sink for gce_forwarding_rule Notifications
 resource "google_logging_project_sink" "gce_forwarding_rule" {
   name        = "gcp_gce_forwarding_rule"
   destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
@@ -132,7 +132,7 @@ resource "google_logging_project_sink" "gce_forwarding_rule" {
 }
 
 
-// Create the Stackdriver Export Sink for gce_network gcp Notifications
+// Create the Stackdriver Export Sink for gce_network Notifications
 resource "google_logging_project_sink" "gce_network" {
   name        = "gcp_gce_network"
   destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
@@ -141,14 +141,24 @@ resource "google_logging_project_sink" "gce_network" {
   unique_writer_identity = true
 }
 
-// Create the Stackdriver Export Sink for gce_network gcp Notifications
+// Create the Stackdriver Export Sink for gce_instance Notifications
 resource "google_logging_project_sink" "gce_instance" {
   name        = "gcp_gce_instance"
   destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  # filter      = "resource.type = gce_instance resource.type = gce_instance jsonPayload._CMDLINE!=""/home/kubernetes/bin/kubelet --v=2 --max-pods=110 --kube-reserved=cpu=60m,memory=960Mi --allow-privileged=true --cgroup-root=/ --cloud-provider=gce --cluster-dns=10.55.240.10 --cluster-domain=cluster.local --pod-manifest-path=/etc/kubernetes/manifests --experimental-mounter-path=/home/kubernetes/containerized_mounter/mounter --experimental-check-node-capabilities-before-mount=true --cert-dir=/var/lib/kubelet/pki/ --enable-debugging-handlers=true --bootstrap-kubeconfig=/var/lib/kubelet/bootstrap-kubeconfig --kubeconfig=/var/lib/kubelet/kubeconfig --anonymous-auth=false --authorization-mode=Webhook --client-ca-file=/etc/srv/kubernetes/pki/ca-certificates.crt --cni-bin-dir=/home/kubernetes/bin --network-plugin=kubenet --volume-plugin-dir=/home/kubernetes/flexvolume --node-labels=beta.kubernetes.io/fluentd-ds-ready=true,cloud.google.com/gke-nodepool=default-pool --eviction-hard=memory.available<100Mi,nodefs.available<10%,nodefs.inodesFree<5% --feature-gates=ExperimentalCriticalPodAnnotation=true"" jsonPayload._CMDLINE!=""/usr/bin/dockerd --registry-mirror=https://mirror.gcr.io --host=fd:// -p /var/run/docker.pid --iptables=false --ip-masq=false --log-level=warn --bip=169.254.123.1/24 --registry-mirror=https://mirror.gcr.io --log-driver=json-file --log-opt=max-size=10m --log-opt=max-file=5 --live-restore=false --insecure-registry 10.0.0.0/8"
   filter      = "resource.type = gce_instance"
+  unique_writer_identity = true
+}
+
+// Create the Stackdriver Export Sink for gce_instanc Notifications
+resource "google_logging_project_sink" "gce_health_check" {
+  name        = "gcp_gce_health_check"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gce_health_check"
 
   unique_writer_identity = true
 }
+
 
 
 
@@ -156,7 +166,7 @@ resource "google_logging_project_sink" "gce_instance" {
 Create the export facilities
 */
 
-// Create the Stackdriver Export Sink for audited_resource gcp Notifications
+// Create the Stackdriver Export Sink for audited_resource Notifications
 resource "google_logging_project_sink" "audited_resource" {
   name        = "gcp-audited_resource"
   destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
@@ -212,5 +222,13 @@ resource "google_project_iam_binding" "gce_instance" {
 
   members = [
     "${google_logging_project_sink.gce_instance.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "gce_health_check" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gce_health_check.writer_identity}",
   ]
 }
