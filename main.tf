@@ -94,40 +94,63 @@ resource "google_container_cluster" "primary" {
 // https://cloud.google.com/logging/docs/export/configure_export_v2#dest-auth
 ///////////////////////////////////////////////////////////////////////////////////////
 
-// Create the Stackdriver Export Sink for Cloud Storage gcp Notifications
-resource "google_logging_project_sink" "storage-sink" {
-  name        = "gcp-storage-sink"
-  destination = "storage.googleapis.com/${google_storage_bucket.gcp-log-bucket.name}"
-  filter      = "resource.type = container"
-
-  unique_writer_identity = true
-}
-
-resource "google_logging_project_sink" "firewall-rules" {
-  name        = "gcp-firewall-rules"
-  destination = "storage.googleapis.com/${google_storage_bucket.gcp-log-bucket.name}"
-  filter      = "resource.type = gce_firewall_rule"
-
-  unique_writer_identity = true
-}
-
 
 // Create the Stackdriver Export Sink for BigQuery gcp Notifications
 resource "google_logging_project_sink" "bigquery-sink" {
   name        = "gcp-bigquery-sink"
   destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
-  filter      = "resource.type = container"
+  filter      = "resource.type = bigquery.v2.dataset"
 
   unique_writer_identity = true
 }
 
-// Grant the role of Storage Object Creator
-resource "google_project_iam_binding" "log-writer-storage" {
-  role = "roles/storage.objectCreator"
 
-  members = [
-    "${google_logging_project_sink.storage-sink.writer_identity}",
-  ]
+// Create the Stackdriver Export Sink for gce_firewall_rule gcp Notifications
+resource "google_logging_project_sink" "gce_firewall_rule" {
+  name        = "gcp-gce_firewall_rule"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gce_firewall_rule"
+
+  unique_writer_identity = true
+}
+
+// Create the Stackdriver Export Sink for gce_forwarding_rule gcp Notifications
+resource "google_logging_project_sink" "gce_forwarding_rule" {
+  name        = "gcp-gce_forwarding_rule"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gce_forwarding_rule"
+
+  unique_writer_identity = true
+}
+
+
+// Create the Stackdriver Export Sink for gce_network gcp Notifications
+resource "google_logging_project_sink" "gce_network" {
+  name        = "gcp-gce_network"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = gce_network"
+
+  unique_writer_identity = true
+}
+
+
+//resource.type =gce_network
+
+
+
+
+
+/*
+Create the export facility
+*/
+
+// Create the Stackdriver Export Sink for audited_resource gcp Notifications
+resource "google_logging_project_sink" "audited_resource" {
+  name        = "gcp-audited_resource"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type =audited_resource"
+
+  unique_writer_identity = true
 }
 
 // Grant the role of BigQuery Data Editor
