@@ -16,7 +16,7 @@
 
 # "---------------------------------------------------------"
 # "-                                                       -"
-# "-  Create starts a GCP Cluster and installs             -"
+# "-  Create starts a gcp Cluster and installs             -"
 # "-  a Cassandra StatefulSet                              -"
 # "-                                                       -"
 # "---------------------------------------------------------"

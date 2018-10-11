@@ -28,7 +28,7 @@ ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=common.sh
 source "$ROOT"/common.sh
 
-# Get the kubectl credentials for the GCP cluster.
+# Get the kubectl credentials for the gcp cluster.
 gcloud container clusters get-credentials "$CLUSTER_NAME" --zone "$ZONE" --project "$PROJECT"
 
 APP_NAME=hello-server

@@ -15,8 +15,12 @@ limitations under the License.
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// This configuration will create the resources and Stackdriver Logging exports for 
-// Cloud Storage and BigQuery.
+//
+// This configuration will create a gcp cluster that will be used for creating
+// log information to be used by Stackdriver Logging.  The configuration will
+// also create the resources and Stackdriver Logging exports for Cloud Storage
+// and BigQuery.
+//
 ///////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -31,16 +35,16 @@ resource "random_id" "server" {
 // Create a Cloud Storage Bucket for long-term storage of logs
 // Note: the bucket has force_destroy turned on, so the data will be lost if you run
 // terraform destroy
-resource "google_storage_bucket" "GCP-log-bucket" {
-  name          = "stackdriver-GCP-logging-bucket-${random_id.server.hex}"
+resource "google_storage_bucket" "gcp-log-bucket" {
+  name          = "stackdriver-gcp-logging-bucket-${random_id.server.hex}"
   storage_class = "NEARLINE"
   force_destroy = true
 }
 
 // Create a BigQuery Dataset for storage of logs
 // Note: only the most recent hour's data will be stored based on the table expiration
-resource "google_bigquery_dataset" "GCP-bigquery-dataset" {
-  dataset_id                  = "GCP_logs_dataset"
+resource "google_bigquery_dataset" "gcp-bigquery-dataset" {
+  dataset_id                  = "gcp_logs_dataset"
   location                    = "US"
   default_table_expiration_ms = 3600000
 
@@ -53,7 +57,7 @@ resource "google_bigquery_dataset" "GCP-bigquery-dataset" {
 // Create the primary cluster for this project.
 ///////////////////////////////////////////////////////////////////////////////////////
 
-// Create the GCP Cluster
+// Create the gcp Cluster
 // https://www.terraform.io/docs/providers/google/d/google_container_cluster.html
 resource "google_container_cluster" "primary" {
   name               = "stackdriver-logging"
@@ -90,19 +94,28 @@ resource "google_container_cluster" "primary" {
 // https://cloud.google.com/logging/docs/export/configure_export_v2#dest-auth
 ///////////////////////////////////////////////////////////////////////////////////////
 
-// Create the Stackdriver Export Sink for Cloud Storage GCP Notifications
+// Create the Stackdriver Export Sink for Cloud Storage gcp Notifications
 resource "google_logging_project_sink" "storage-sink" {
-  name        = "GCP-storage-sink"
-  destination = "storage.googleapis.com/${google_storage_bucket.GCP-log-bucket.name}"
+  name        = "gcp-storage-sink"
+  destination = "storage.googleapis.com/${google_storage_bucket.gcp-log-bucket.name}"
   filter      = "resource.type = container"
 
   unique_writer_identity = true
 }
 
-// Create the Stackdriver Export Sink for BigQuery GCP Notifications
+resource "google_logging_project_sink" "firewall-rules" {
+  name        = "gcp-firewall-rules"
+  destination = "storage.googleapis.com/${google_storage_bucket.gcp-log-bucket.name}"
+  filter      = "resource.type = gce_firewall_rule"
+
+  unique_writer_identity = true
+}
+
+
+// Create the Stackdriver Export Sink for BigQuery gcp Notifications
 resource "google_logging_project_sink" "bigquery-sink" {
-  name        = "GCP-bigquery-sink"
-  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.GCP-bigquery-dataset.dataset_id}"
+  name        = "gcp-bigquery-sink"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
   filter      = "resource.type = container"
 
   unique_writer_identity = true

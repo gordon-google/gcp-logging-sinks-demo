@@ -32,8 +32,8 @@ source "$ROOT"/common.sh
 
 # We have to delete the dataset before the Terraform
 # Otherwise we will run into the following error
-# "google_bigquery_dataset.GCP-bigquery-dataset: googleapi:
-# Error 400: Dataset pso-helmsman-cicd-infra:GCP_logs_dataset is still in use, resourceInUse"
+# "google_bigquery_dataset.gcp-bigquery-dataset: googleapi:
+# Error 400: Dataset pso-helmsman-cicd-infra:gcp_logs_dataset is still in use, resourceInUse"
 bq rm -r -f "${PROJECT}":"${BQ_LOG_DS}"
 
 # Terraform destroy

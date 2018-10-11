@@ -57,6 +57,6 @@ fi
 # shellcheck disable=SC2034
 CLUSTER_NAME=stackdriver-logging
 
-# bigquery for GCP log
+# bigquery for gcp log
 # shellcheck disable=SC2034
-BQ_LOG_DS=GCP_logs_dataset
+BQ_LOG_DS=gcp_logs_dataset
