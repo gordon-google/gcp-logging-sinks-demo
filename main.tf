@@ -22,7 +22,6 @@ limitations under the License.
 //filter out GKE KubeLet heathcheck/heartbeat stuff
 
 //add the following:
-# Logging export sink
 # Service Account
 
 // Random string used to create a unique bucket name
@@ -257,6 +256,27 @@ resource "google_logging_project_sink" "k8s_cluster" {
   unique_writer_identity = true
 }
 
+// Create the Stackdriver Export Sink for k8s_cluster Notifications
+resource "google_logging_project_sink" "logging_sink" {
+  name        = "gcp_logging_sink"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = logging_sink"
+
+  unique_writer_identity = true
+}
+
+
+// Create the Stackdriver Export Sink for k8s_cluster Notifications
+resource "google_logging_project_sink" "service_account" {
+  name        = "gcp_service_account"
+  destination = "bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.gcp-bigquery-dataset.dataset_id}"
+  filter      = "resource.type = service_account"
+
+  unique_writer_identity = true
+}
+
+
+
 /*
 Create the export facilities
 */
@@ -424,4 +444,18 @@ resource "google_project_iam_binding" "k8s_cluster" {
   ]
 }
 
+resource "google_project_iam_binding" "logging_sink" {
+  role = "roles/bigquery.dataEditor"
 
+  members = [
+    "${google_logging_project_sink.logging_sink.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "service_account" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.service_account.writer_identity}",
+  ]
+}
