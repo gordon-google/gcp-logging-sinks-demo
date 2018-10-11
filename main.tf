@@ -124,7 +124,7 @@ resource "google_logging_project_sink" "gce_network" {
 }
 
 /*
-Create the export facility
+Create the export facilities
 */
 
 // Create the Stackdriver Export Sink for audited_resource gcp Notifications
@@ -136,11 +136,44 @@ resource "google_logging_project_sink" "audited_resource" {
   unique_writer_identity = true
 }
 
-// Grant the role of BigQuery Data Editor
+// Grant BigQuery Data Editor role to exports
 resource "google_project_iam_binding" "log-writer-bigquery" {
   role = "roles/bigquery.dataEditor"
 
   members = [
     "${google_logging_project_sink.bigquery-sink.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "log-gce_firewall_rule" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gce_firewall_rule.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "log-audited_resource" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.audited_resource.writer_identity}",
+  ]
+}
+
+resource "google_project_iam_binding" "gce_forwarding_rule" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gce_forwarding_rule.writer_identity}",
+  ]
+}
+
+
+resource "google_project_iam_binding" "gce_network" {
+  role = "roles/bigquery.dataEditor"
+
+  members = [
+    "${google_logging_project_sink.gce_network.writer_identity}",
   ]
 }
