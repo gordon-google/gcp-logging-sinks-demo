@@ -26,11 +26,11 @@ resource "random_id" "server" {
 // Create a Cloud Storage Bucket for long-term storage of logs
 // Note: the bucket has force_destroy turned on, so the data will be lost if you run
 // terraform destroy
-resource "google_storage_bucket" "gcp-log-bucket" {
-  name          = "stackdriver-gcp-logging-bucket-${random_id.server.hex}"
-  storage_class = "NEARLINE"
-  force_destroy = true
-}
+# resource "google_storage_bucket" "gcp-log-bucket" {
+#   name          = "stackdriver-gcp-logging-bucket-${random_id.server.hex}"
+#   storage_class = "NEARLINE"
+#   force_destroy = true
+# }
 
 // Create a BigQuery Dataset for storage of logs
 // Note: only the most recent hour's data will be stored based on the table expiration
